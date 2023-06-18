@@ -12,34 +12,133 @@
 </head>
 <style>
     .box {
-        z-index: 9999;
         position: relative;
+        box-shadow: none;
     }
+
+
+    .bar {
+        background: #E8FFAD;
+        border: 3px black solid;
+        box-shadow: 3px 4px black;
+    }
+
+    .jadak {
+        color: white;
+        background: #009E60
+    }
+
+    .nejdak {
+        background: #9E000B
+    }
+
+    .card-stack {
+        z-index: 9999;
+        height: 300px;
+        pointer-events: auto;
+    }
+
+    .stacked_card {
+        pointer-events: auto;
+        position: absolute;
+        min-height: 300px;
+        width: 300px;
+    }
+    .stacked_card:nth-child(1) {
+        top: 24px;
+        width: 60%;
+    }
+    .stacked_card:nth-child(2) {
+        top: 36px;
+        width: 70%;
+    }
+    .stacked_card:nth-child(3) {
+        top: 48px;
+        width: 80%;
+    }
+    .stacked_card:nth-child(4) {
+        top: 60px;
+        width: 90%;
+    }
+    .stacked_card:nth-child(5) {
+        top: 72px;
+        width: 100%;
+    }
+
+    .is-active-card {
+        border: 3px solid black;
+    }
+
+    #map {
+        z-index: 200;
+    }
+    
+    
+
 </style>
 <body>
     <section id="map" class="hero section is-fullheight">
         <div class="columns">
-            <div class="column">
-            </div>
-            <div class="column">
-            </div>
-            <div class="column">
-            </div>
-            <div class="column">
-            </div>
-            <div class="column">
-                <div style="background: transparent;" id="bar-container" class="box">
+            <div id="overlay" class="column is-offset-9 is-3">
+                <div style="position:relative" id="card-stack" class="card-stack">
                 </div>
             </div>
         </div>
     </section>
     <script>
+        /* Ensure that there is no clickthrough on the overlay */
+        var nopropagation = L.DomUtil.get('overlay'); // this must be an ID, not class!
+        L.DomEvent.on(nopropagation, 'click', L.DomEvent.stopPropagation);
+        
+        /* Function that creates the cards */
+        function cardCreator(barName, altName) {
+            var stackCard = `<div class="stacked_card">
+                                <div id="overlay" class="bar">
+                                    <div class="card-image">
+                                        <figure class="image is-4by3">
+                                        <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">
+                                        </figure>
+                                    </div>
+                                    <div class="card-content">
+                                        <p class="title is-5">`+ barName+ `</p>
+                                        <p class="subtitle is-6">` + altName + `</p>
+                            <div class="content">
+                                <p>
+                                En kort beskrivelse kommer her ?
+                                </p>
+                                <!-- SOCIAL MEDIA -->
+                                <a href="#">instagram</a> <a href="#">facebook</a>
+                                <br>
+                            </div>
+                            </div>
+                                <footer class="card-footer">
+                                    <a href="#" onclick="yesPlease()" class="card-footer-item jadak">Jadak</a>
+                                    <a href="#" onclick="noThanks()" class="card-footer-item nejdak">Nejdak</a>
+                                </footer>
+                            
+                        </div>
+                    </div>`
+
+            return stackCard
+        }
+        
+        /* Styles for markers */
         var myStyle = {
             "color": "#00b0ff",
             "weight": 5,
             "opacity": 1,
             "lineCap": "round",
             "lineJoin": "round"
+        };
+
+        var nonfocusLine = {
+            color: "#bbbdbf",
+            weight: 5,
+            opacity: 1
+        }, nonfocusLineStroke = {
+            color: "#929497",
+            weight: 8,
+            opacity: 1
         };
 
         var style = {
@@ -87,10 +186,19 @@
             prefix: 'bi'
         });
         */
+
+        function yesPlease() {
+
+        }
         
-        
-        var barcontainer = document.querySelector('#bar-container');
-                
+        function noThanks() {
+            let content = document.getElementById("card-stack");
+            let firstChild = content.children[1];
+            let lastChild = content.lastChild;
+            content.insertBefore(lastChild,firstChild);
+        }
+            
+        /* LEAFLET */
         var map = L.map('map').setView([55.676098, 12.568337], 13);
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
@@ -111,65 +219,62 @@
 
         map.on('click', function(e) {
             layerGroup.clearLayers();
+            document.getElementsByClassName("card-stack")[0].innerHTML = "";
             L.marker(e.latlng).addTo(layerGroup);
             getNearestBar(e.latlng);
-
         });
-
-
 
         function getNearestBar(latlng) {    
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET","http://159.89.28.191:8000/route/" + String(latlng.lng) + "/" + String(latlng.lat), true)
+            xhttp.open("GET","https://api.hvor.io/route/" + String(latlng.lng) + "/" + String(latlng.lat), true)
             xhttp.onreadystatechange    = function () {
             if (this.readyState == 4 && this.status == 200) {
-                barcontainer.innerHTML = "";
                 var data = JSON.parse(this.responseText);
-                /* Handle the quickest route */
-                const route = data.route[0];
+                /* Handle the quickest route */ 
+                
+                for (var i = data.metadataBar[0][0].length - 1; i >= 0; i--) {
+                    if (data.metadataBar[0][0][i].name == 'startposition') {
+                        continue;
+                    }
+                    else {
+                    document.getElementsByClassName("card-stack")[0].innerHTML += cardCreator(data.metadataBar[0][0][i].name, data.metadataBar[0][0][i].altname)
+                }
+                }
+                
+                console.log(data)
+
+                for (var i = data.metadataBar[0][0].length - 1; i >= 0; i--) {
+                    if (data.metadataBar[0][0][i].name == 'startposition') {
+                        continue;
+                    }
+                    else {
+                        const route = data.metadataBar[0][0][i].theline;
+                        const parsedRoute = JSON.parse(route);
+                        L.geoJSON(parsedRoute, {style: nonfocusLineStroke}).addTo(layerGroup);
+                        L.geoJSON(parsedRoute, {style: nonfocusLine}).addTo(layerGroup);
+                    }
+                }
+                
+                const route = data.metadataBar[0][0][0].theline;
                 const parsedRoute = JSON.parse(route);
+
+                /* Google maps style */
                 L.geoJSON(parsedRoute, {style: stroke}).addTo(layerGroup);
                 L.geoJSON(parsedRoute, {style: style}).addTo(layerGroup);
-                const routeCoords = JSON.parse(data.route[0]);
+                
+                const routeCoords = JSON.parse(data.metadataBar[0][0][0].theline);
                 const coords = routeCoords.coordinates;
                 L.marker({"lng": coords[coords.length - 1][0], "lat": coords[coords.length -1][1]},{icon: drinkTime}).addTo(layerGroup);
                 
-                /* Handle other data*/
-                const barName = data.metadataBar[0][0][0].name;
-                const altName = data.metadataBar[0][0][0].altname;
-                
-                barcontainer = document.querySelector('#bar-container')
-                var card = `<div class="card">
-                    <div class="card-image">
-                    <figure class="image is-4by3">
-                    <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">
-                    </figure>
-                    </div>
-                    <div class="card-content">
-                    <p class="title is-5">`+ barName+ `</p>
-                    <p class="subtitle is-6">` + altName + `</p>
-                    <div class="content">
-                    <p>
-                    En kort beskrivelse kommer her ?
-                    </p>
-                    <p>
-                    -- Den lukker kl. 02:00, det er om!
-                    </p>
-
-                    <!-- SOCIAL MEDIA -->
-                    <a href="#">instagram</a> <a href="#">facebook</a>
-                    <br>
-                    <footer class="card-footer">
-    <a href="#" class="card-footer-item">Save</a>
-    <a href="#" class="card-footer-item">Edit</a>
-    <a href="#" class="card-footer-item">Delete</a>
-  </footer>
-                    </div>
-                    </div>
-                    </div>`
-                barcontainer.innerHTML = card
+                function stackCreator() {
+                    var stack = [];
+                    for (var i = 0; i < data.metadataBar[0][0].length; i++) {
+                        stack.push(data.metadataBar[0][0][i].name);
+                    }
+                    return stack;
                 }
             }
+        }
             // Sending our request
             xhttp.send();
         };
