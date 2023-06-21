@@ -81,15 +81,18 @@
         z-index: 200;
     }
     
-    
-
 </style>
 <body>
     <section id="map" class="hero section is-fullheight">
         <div class="columns">
             <div id="overlay" class="column is-offset-9 is-3">
-                <div style="position:relative" id="card-stack" class="card-stack">
+                <div style="position:relative" id="card-stack" class="card-stack is-hidden-touch">
                 </div>
+            </div>
+        </div>
+        <div class="columns is-hidden-desktop mt-auto">
+            <div id="overlay" class="column is-3">
+                <div style="width: 100vw; z-index: 9999" class="box">HELLOOO</div>
             </div>
         </div>
     </section>
@@ -266,7 +269,7 @@
         
         map.locate({setView: true, maxZoom: 16});
         
-        var layerGroup = L.layerGroup().addTo(map);
+        var layerGroup = L.featureGroup().addTo(map);
 
         function onLocationFound(e) {
             var radius = e.accuracy;
@@ -300,6 +303,7 @@
             let route = data.metadataBar[0][0][0].theline;
             let parsedRoute = JSON.parse(route);
             mainRoute(parsedRoute,data);
+            map.fitBounds(layerGroup.getBounds());
         }
         }
 
