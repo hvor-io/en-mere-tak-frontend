@@ -325,7 +325,7 @@
 
         function getData(latlng, callback) {
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET","https://api.hvor.io/route/" + String(latlng.lng) + "/" + String(latlng.lat), true)
+            xhttp.open("GET","https://api.hvor.io/route/?in_lng=" + String(latlng.lng) + "&in_lat=" + String(latlng.lat), true)
             xhttp.onreadystatechange    = function () {
             if (this.readyState == 4 && this.status == 200) {
                 /* Loading data for the first time */
