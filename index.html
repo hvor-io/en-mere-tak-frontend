@@ -80,19 +80,25 @@
     #map {
         z-index: 200;
     }
+
+    @media screen and (max-width:1023px) {
+        .my-hero {
+            display: flex;
+            flex-direction: column-reverse !important;
+        }
+
+        .barstack {
+            margin-top: auto;
+        }
+    }
     
 </style>
 <body>
-    <section id="map" class="hero section is-fullheight">
-        <div class="columns">
-            <div id="overlay" class="column is-offset-9 is-3">
-                <div style="position:relative" id="card-stack" class="card-stack is-hidden-touch">
+    <section id="map" class="hero my-hero section is-fullheight">
+        <div class="columns barstack">
+            <div id="overlay" class="column is-offset-9-desktop is-3-desktop is-full-mobile">
+                <div style="position:relative" id="card-stack" class="card-stack ">
                 </div>
-            </div>
-        </div>
-        <div class="columns is-hidden-desktop mt-auto">
-            <div id="overlay" class="column is-3">
-                <div style="width: 100vw; z-index: 9999" class="box">HELLOOO</div>
             </div>
         </div>
     </section>
@@ -108,7 +114,7 @@
         function cardCreator(barName, altName, listNumber) {
             var stackCard = `<div data-list="`+ listNumber + `" class="stacked_card animate__faster">
                                 <div id="overlay" class="bar">
-                                    <div class="card-image">
+                                    <div class="card-image is-hidden-touch">
                                         <figure class="image is-4by3">
                                         <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">
                                         </figure>
@@ -116,22 +122,22 @@
                                     <div class="card-content">
                                         <p class="title is-5">`+ barName+ `</p>
                                         <p class="subtitle is-6">` + altName + `</p>
-                            <div class="content">
-                                <p>
-                                En kort beskrivelse kommer her ?
-                                </p>
-                                <!-- SOCIAL MEDIA -->
-                                <a href="#">instagram</a> <a href="#">facebook</a>
-                                <br>
-                            </div>
-                            </div>
-                                <footer class="card-footer">
+                                        <div class="content">
+                                        <p>
+                                        En kort beskrivelse kommer her ?
+                                        </p>
+                                        <!-- SOCIAL MEDIA -->
+                                        <a href="#">instagram</a> <a href="#">facebook</a>
+                                        <br>
+                                        </div>
+                                    </div>
+                                <footer class="card-footer is-hidden-touch">
                                     <a href="#" onclick="yesPlease()" class="card-footer-item jadak">Jadak</a>
                                     <a href="#" onclick="noThanks()" class="card-footer-item nejdak">Nejdak</a>
                                 </footer>
                             
-                        </div>
-                    </div>`
+                                </div>
+                            </div>`
 
             return stackCard
         }
