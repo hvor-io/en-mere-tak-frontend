@@ -13,6 +13,8 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
   />
     <script src="./static/leaflet.extra-markers.js"></script>
+
+    
 </head>
 <style>
     .box {
@@ -91,18 +93,29 @@
             margin-top: auto;
         }
     }
+
+    .mobdak {
+        width: 100px;
+        height: 100px;
+        z-index: 998;
+    }
     
 </style>
 <body>
     <section id="map" class="hero my-hero section is-fullheight">
-        <div class="columns barstack">
-            <div id="overlay" class="column is-offset-9-desktop is-3-desktop is-full-mobile">
+        <div id="overlay" class="columns barstack">
+            <div class="column is-2-mobile is-hidden-desktop is-align-items-center is-flex is-justify-content-flex-end"><button class="button is-success mobdak" onclick="yesPlease()">Jadak</button></div>
+            <div class="column is-offset-9-desktop is-3-desktop is-full-mobile">
                 <div style="position:relative" id="card-stack" class="card-stack ">
                 </div>
             </div>
+            <div class="column is-flex is-align-items-center is-2-mobile is-hidden-desktop is-justify-content-flex-start"><button class="button is-warning mobdak" onclick="noThanks()">Nejdak</button></div>
         </div>
     </section>
     <script>
+        
+
+
         var persistData;
         var startPosition;
         var stackOrder = new Array();
